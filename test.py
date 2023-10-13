@@ -5,9 +5,12 @@ import requests
 url = 'https://example.com/'  # ウェブサイトのURLを指定
 response = requests.get(url)
 
+#指定したURLにGETリクエストを行う
 if response.status_code == 200:
+    #GETリクエストが成功した場合、HTMLを取得する
     html_content = response.text
 else:
+    #GETリクエストが失敗した場合、取得できないと表示する
     print("ウェブページを取得できませんでした。")
 
 
