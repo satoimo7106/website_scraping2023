@@ -38,8 +38,8 @@ def collect_urls_and_extract_text(url, depth=1, max_depth=3):
 
     # テキストを抽出
     text = soup.get_text()
-    # 正規表現を使用して"test{xxxx}"のパターンを抽出
-    matches = re.findall(r'test\{[^\}]*\}', text)
+    # 正規表現を使用して"TEST{xxxx}"のパターンを抽出
+    matches = re.findall(r'TEST\{[^\}]*\}', text)
     extracted_texts.extend(matches)
 
 # スタートURLを指定
