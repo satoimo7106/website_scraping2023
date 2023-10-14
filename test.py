@@ -18,14 +18,17 @@ soup = BeautifulSoup(html_content, 'html.parser')
 # 例: タイトルを取得
 title = soup.title.string
 
+# すべてのリンク（<a>要素）を取得
 links = soup.find_all('a')
 
+
+# 各リンクのURLを表示
 for link in links:
     print(link.get('href'))
 
 num_links = len(links)
 
-print(f"リンク数: {num_links}")
+print("リンク数:"+ str(num_links))
 
 
 #スタートのページのリンクを全部取得
