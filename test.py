@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+# import html5lib
 
 # すべての収集済みURLを格納するセット
 url_list = []
@@ -8,13 +9,9 @@ url_list = []
 # 抽出したテキストを格納するリスト
 keyword_list = []
 
-#キーワードを抽出する処理
-def get_keyword(text):
-    # 正規表現を使用して"TEST{xxxx}"のパターンを抽出（一致したものをすべてリストに格納）
-    matches = re.findall(r'TEST\{[^\}]*\}', text)
-    #【要修正】リストにそのまま続けて記録する or ページごとにキーワードを管理する（appendにして２次元配列にする）
-    keyword_list.extend(matches)
-    return
+#【要修正】スタートURLを指定（将来的には利用者が入力できるように）
+# start_url=input() #入力する場合（CUI)
+start_url = 'http://127.0.0.1:5500/website_scraping2023/testsite/index.html'
 
 # 指定したURLからリンクを収集、再帰的に処理する関数
 #関数名を後で変えたい
@@ -25,16 +22,16 @@ def get_urls(url):
 
     # ページのコンテンツを取得
     response = requests.get(url)
-    page_content = response.text
 
     # BeautifulSoupを使用してHTMLを解析
-    soup = BeautifulSoup(page_content, 'html.parser')
+    soup = BeautifulSoup(response.text, 'html.parser')
 
     # すべてのリンク（<a>要素）を取得
     links = soup.find_all('a')
 
     # テキストを抽出
     text = soup.get_text()
+    print(text)
 
     #keywordを抽出する関数
     get_keyword(text)
@@ -50,8 +47,15 @@ def get_urls(url):
             if href not in url_list:
                 get_urls(href)
 
-#【要修正】スタートURLを指定（将来的には利用者が入力できるように）
-start_url = 'http://127.0.0.1:5500/testsite/index.html'
+
+#キーワードを抽出する処理
+def get_keyword(text):
+    # 正規表現を使用して"MBSD{xxxx}"を抽出して（一致したものをすべてリストに格納）
+    #【要修正】リストにそのまま続けて記録する or ページごとにキーワードを管理する（appendにして２次元配列にする）
+    keyword_list.extend(re.findall(r'MBSD\{[^\}]*\}', text))
+    return
+
+
 
 # URLを収集
 get_urls(start_url)
