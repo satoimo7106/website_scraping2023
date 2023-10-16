@@ -10,8 +10,9 @@ keyword_list = []
 
 #キーワードを抽出する処理
 def get_keyword(text):
-    # 正規表現を使用して"TEST{xxxx}"のパターンを抽出
+    # 正規表現を使用して"TEST{xxxx}"のパターンを抽出（一致したものをすべてリストに格納）
     matches = re.findall(r'TEST\{[^\}]*\}', text)
+    #【要修正】リストにそのまま続けて記録する or ページごとにキーワードを管理する（appendにして２次元配列にする）
     keyword_list.extend(matches)
     return
 
@@ -35,7 +36,6 @@ def get_urls(url):
     # テキストを抽出
     text = soup.get_text()
 
-    #【要修正】（再帰的に、そのページのすべてのキーワードを収集するようにする）
     #keywordを抽出する関数
     get_keyword(text)
 
@@ -61,7 +61,7 @@ print("URLs:")
 for url in url_list:
     print(url)
 
-# 抽出したテキストを表示
+# 抽出したキーワードを表示
 print("\nKeyWord:")
 for keyword in keyword_list:
     print(keyword)
