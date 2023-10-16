@@ -52,7 +52,11 @@ def get_urls(url):
 def get_keyword(text):
     # 正規表現を使用して"MBSD{xxxx}"を抽出して（一致したものをすべてリストに格納）
     #【要修正】リストにそのまま続けて記録する or ページごとにキーワードを管理する（appendにして２次元配列にする）
-    keyword_list.extend(re.findall(r'MBSD\{[^\}]*\}', text))
+    keyword=re.findall(r'MBSD\{[^\}]*\}', text)
+    
+    # if keyword not in keyword_list:
+    #     keyword_list.extend(keyword)
+    
     return
 
 
