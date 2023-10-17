@@ -41,7 +41,10 @@ def get_urls(url):
         href = link.get('href')
         if href:
             # 【要修正】絶対URLに変換（URLが"http"から始まっていない場合）
-            if not href.startswith('http'):
+            #http://xxxx/みたいな形に+href
+            #ドメインが異なる可能性がある
+            if not href.startswith('http') and href.endswith('/'):
+                input_url.rsplit('/', 1)
                 href = url + href
             # 収集済みのURLでない場合に再帰的に処理
             if href not in url_list:
