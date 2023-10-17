@@ -11,7 +11,7 @@ keyword_list = []
 
 #【要修正】スタートURLを指定（将来的には利用者が入力できるように）
 # start_url=input() #入力する場合（CUI)
-start_url = 'http://127.0.0.1:5500/website_scraping2023/testsite/index.html'
+start_url = 'http://127.0.0.1:5500/testsite/index.html'
 
 # 指定したURLからリンクを収集、再帰的に処理する関数
 #関数名を後で変えたい
@@ -31,7 +31,7 @@ def get_urls(url):
 
     # テキストを抽出
     text = soup.get_text()
-    print(text)
+    # print(text)
 
     #keywordを抽出する関数
     get_keyword(text)
@@ -40,12 +40,11 @@ def get_urls(url):
         #aタグのhref属性（URL部分）を取得
         href = link.get('href')
         if href:
-            # 【要修正】絶対URLに変換（URLが"http"から始まっていない場合）
-            #http://xxxx/みたいな形に+href
-            #ドメインが異なる可能性がある
-            if not href.startswith('http') and href.endswith('/'):
-                input_url.rsplit('/', 1)
-                href = url + href
+            # # 【要修正】絶対URLに変換（URLが"http"から始まっていない場合）
+            # #http://xxxx/みたいな形に+href
+            # if not href.startswith('http') and href.endswith('/'):
+            #     url.rsplit('/', 1)
+            #     href = url + href
             # 収集済みのURLでない場合に再帰的に処理
             if href not in url_list:
                 get_urls(href)
@@ -57,8 +56,8 @@ def get_keyword(text):
     #【要修正】リストにそのまま続けて記録する or ページごとにキーワードを管理する（appendにして２次元配列にする）
     keyword=re.findall(r'MBSD\{[^\}]*\}', text)
     
-    # if keyword not in keyword_list:
-    #     keyword_list.extend(keyword)
+    if keyword not in keyword_list:
+        keyword_list.extend(keyword)
     
     return
 
