@@ -1,77 +1,93 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import urllib.parse
 # import html5lib
 
-# すべての収集済みURLを格納するセット
+# URLを格納するリスト
 url_list = []
 
-# 抽出したテキストを格納するリスト
+#パラメータを格納するリスト
+parameter_list=[]
+
+#ページタイトルを格納するリスト
+title_list=[]
+
+# 抽出したキーワード(MBSD{xxxx})を格納するリスト
 keyword_list = []
 
-#【要修正】スタートURLを指定（将来的には利用者が入力できるように）
-# start_url=input() #入力する場合（CUI)
-start_url = 'http://127.0.0.1:5500/testsite/index.html'
 
-# 指定したURLからリンクを収集、再帰的に処理する関数
-#関数名を後で変えたい
+#スタートURLを指定（将来的には利用者が入力できるように）
+print("対象サイトのURLを入力してください（例：https://example.com/)")
+start_url=input() #入力する場合（CUI)
+
+#対象のドメインを指定
+print("対象のドメインを入力してください（例：example.com)")
+target_domain=input() #入力する場合（CUI)
+
+#URLからリンクを収集、再帰的に処理する関数
 def get_urls(url):
+    
+    #対象のドメインがURLに含まれる場合のみ処理
+    if target_domain in url:
 
-    # URLを収集
-    url_list.append(url)
+        # URLをurl_listに追加
+        url_list.append(url)
 
-    # ページのコンテンツを取得
-    response = requests.get(url)
+        # ページのコンテンツを取得
+        response = requests.get(url)
 
-    # BeautifulSoupを使用してHTMLを解析
-    soup = BeautifulSoup(response.text, 'html.parser')
+        # BeautifulSoupを使用してHTMLを解析
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-    # すべてのリンク（<a>要素）を取得
-    links = soup.find_all('a')
+        # すべてのリンク（<a>要素）を取得
+        links = soup.find_all('a')
 
-    # テキストを抽出
-    text = soup.get_text()
-    # print(text)
+        # テキストを抽出
+        text = soup.get_text()
 
-    #keywordを抽出する関数
-    get_keyword(text)
+        #URLからパラメータ（q="xxxx")を取得
+        parameter=urllib.parse.urlparse(url).query
+        #パラメータが取得できた場合、パラメータリストに追加
+        if parameter:
+            parameter_list.append(parameter)
+        #取得できなかった場合、パラメータリストに"なし"を追加
+        else:
+            parameter_list.append("なし")
+
+        #ページタイトルを取得
+        
+
+
+        #キーワードを抽出する
+        # 正規表現を使用して"MBSD{xxxx}"を抽出して一致したものをすべてリストに格納
+        keyword=re.findall(r'MBSD\{[^\}]*\}', text)
+
+        for k in keyword:
+            #キーワードリストに含まれていない場合に追加
+            if k not in keyword_list:
+                keyword_list.append(k)
+
 
     for link in links:
         #aタグのhref属性（URL部分）を取得
         href = link.get('href')
-        if href:
-            # # 【要修正】絶対URLに変換（URLが"http"から始まっていない場合）
-            # #http://xxxx/みたいな形に+href
-            # if not href.startswith('http') and href.endswith('/'):
-            #     url.rsplit('/', 1)
-            #     href = url + href
+        if href and href not in url_list:
             # 収集済みのURLでない場合に再帰的に処理
-            if href not in url_list:
-                get_urls(href)
-
-
-#キーワードを抽出する処理
-def get_keyword(text):
-    # 正規表現を使用して"MBSD{xxxx}"を抽出して（一致したものをすべてリストに格納）
-    #【要修正】リストにそのまま続けて記録する or ページごとにキーワードを管理する（appendにして２次元配列にする）
-    keyword=re.findall(r'MBSD\{[^\}]*\}', text)
-    
-    if keyword not in keyword_list:
-        keyword_list.extend(keyword)
-    
-    return
+            get_urls(href)
 
 
 
-# URLを収集
+#URLを収集
 get_urls(start_url)
 
-# 収集済みのURLを表示
-print("URLs:")
-for url in url_list:
-    print(url)
+#収集済みのURLを表示
+print("URL|パラメータ|ページタイトル")
+for url,parameter,title in zip(url_list,parameter_list,title_list):
+    print(url,parameter,title)
 
-# 抽出したキーワードを表示
+#キーワードリストを表示
 print("\nKeyWord:")
-for keyword in keyword_list:
-    print(keyword)
+for k in keyword_list:
+    print(k)
+
