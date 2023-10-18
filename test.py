@@ -10,8 +10,8 @@ url_list = []
 keyword_list = []
 
 #【要修正】スタートURLを指定（将来的には利用者が入力できるように）
-# start_url=input() #入力する場合（CUI)
-start_url = 'http://127.0.0.1:5500/testsite/index.html'
+start_url=input() #入力する場合（CUI)
+# start_url = 'http://127.0.0.1:5500/testsite/index.html'
 
 # 指定したURLからリンクを収集、再帰的に処理する関数
 #関数名を後で変えたい
