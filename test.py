@@ -19,8 +19,6 @@ try:
     # 抽出したキーワード(MBSD{xxxx})を格納するリスト
     keyword_list = []
 
-    # links=[]
-
     #スタートURLを指定（将来的には利用者が入力できるように）
     print("対象サイトのURLを入力してください（例：https://example.com/)")
     start_url=input() #入力する場合（CUI)
