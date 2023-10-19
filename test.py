@@ -19,8 +19,6 @@ try:
     # 抽出したキーワード(MBSD{xxxx})を格納するリスト
     keyword_list = []
 
-    # links=[]
-
     #スタートURLを指定（将来的には利用者が入力できるように）
     print("対象サイトのURLを入力してください（例：https://example.com/)")
     start_url=input() #入力する場合（CUI)
@@ -78,14 +76,14 @@ try:
         for link in links:
             #aタグのhref属性（URL部分）を取得
             href = link.get('href')
-            if href and href not in url_list:
+            if href and href not in url_list and target_domain in href:
                 # 収集済みのURLでない場合に再帰的に処理
                 get_urls(href)
 
 
     #URLを収集
-    # if target_domain in start_url:
-    get_urls(start_url)
+    if target_domain in start_url:
+        get_urls(start_url)
 
     #収集済みのURLを表示
     print("\nURL|パラメータ|ページタイトル")
@@ -96,7 +94,10 @@ try:
     print("\nKeyWord:")
     for k in keyword_list:
         print(k)
+    
+    input("Enterを押すと終了します")
         
 #何かしらのエラーが発生したらエラー表示
 except Exception: 
     print("エラーが発生しました")
+    input("Enterを押すと終了します")
