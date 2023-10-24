@@ -1,4 +1,3 @@
-#v1.0.0
 import requests
 from bs4 import BeautifulSoup
 import re
