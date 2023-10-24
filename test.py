@@ -76,15 +76,7 @@ try:
         for link in links:
             #aタグのhref属性（URL部分）を取得
             href = link.get('href')
-<<<<<<< HEAD
             if href and href not in url_list and target_domain in href:
-=======
-<<<<<<< HEAD
-            if href and href not in url_list and target_domain in href:
-=======
-            if href and href not in url_list:  #AND?でドメイン以外のURLは処理しないようにする
->>>>>>> 9285cfd8ade0ddbf80e77367dedea95dfb68714d
->>>>>>> 1c9d3f19c921e675102c7899d9da9bc21336b2fe
                 # 収集済みのURLでない場合に再帰的に処理
                 get_urls(href)
 
