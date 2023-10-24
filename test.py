@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import urllib.parse
-# import html5lib
 
 #とりあえずのエラー処理
 try:
@@ -79,7 +78,6 @@ try:
             if href and href not in url_list and target_domain in href:
                 # 収集済みのURLでない場合に再帰的に処理
                 get_urls(href)
-
 
     #URLを収集
     if target_domain in start_url:
