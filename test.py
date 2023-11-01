@@ -2,11 +2,15 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import urllib.parse
+import tkinter as tk
+
+
+
 
 #とりあえずのエラー処理
 try:
 
-    def main():
+    def main_function(start_url,target_domain):
         # URLを格納するリスト
         url_list = []
 
@@ -32,7 +36,7 @@ try:
 
             # URLをurl_listに追加
             url_list.append(url)
-            
+
             # ページのコンテンツを取得
             response = requests.get(url)
 
@@ -101,19 +105,6 @@ except Exception:
     print("エラーが発生しました")
     input("Enterを押すと終了します")
 
-import tkinter as tk
-
-# ボタンがクリックされたときの処理
-def calculate():
-    try:
-        # 入力欄から数値を取得
-        num1 = float()
-        num2 = float(entry2.get())
-        
-        # 数値を合計し、結果をテキストフィールドに表示
-        result.set(f"合計: {num1 + num2}")
-    except ValueError:
-        result.set("エラー: 有効な数値を入力してください")
 
 # Tkinterウィンドウの作成
 window = tk.Tk()
@@ -133,8 +124,8 @@ entry2 = tk.Entry(window)
 entry2.pack()
 
 # ボタンの作成
-calculate_button = tk.Button(window, text="出力", command=lambda:get_urls(str(entry1.get())))
-calculate_button.pack()
+action_button = tk.Button(window, text="出力", command=lambda:main_function(str(entry1.get()),str(entry2.get())))
+action_button.pack()
 
 # 結果を表示するためのテキストフィールド
 result = tk.StringVar()
@@ -143,3 +134,5 @@ result_label.pack()
 
 # ウィンドウのメインループ
 window.mainloop()
+
+
