@@ -2,36 +2,65 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import urllib.parse
+import tkinter as tk
+from tkinter import Scrollbar, Text
+
+
 
 #とりあえずのエラー処理
-try:
+# try:
 
-    # URLを格納するリスト
-    url_list = []
 
-    #パラメータを格納するリスト
-    parameter_list=[]
+#--------GUI-------------
 
-    #ページタイトルを格納するリスト
-    title_list=[]
+#Tkinterウィンドウの作成
+window = tk.Tk()
+window.title("自動巡回ツール")
 
-    # 抽出したキーワード(MBSD{xxxx})を格納するリスト
-    keyword_list = []
+#ラベルと入力欄の作成
+label1 = tk.Label(window, text="対象サイトのURLを入力してください（例：https://example.com/)")
+label1.pack()
 
-    #スタートURLを指定（将来的には利用者が入力できるように）
-    print("対象サイトのURLを入力してください（例：https://example.com/)")
-    start_url=input() #入力する場合（CUI)
+entry1 = tk.Entry(window)
+entry1.pack()
 
-    #対象のドメインを指定
-    print("対象のドメインを入力してください（例：example.com)")
-    target_domain=input() #入力する場合（CUI)
+label2 = tk.Label(window, text="対象のドメインを入力してください（例：example.com)")
+label2.pack()
+
+entry2 = tk.Entry(window)
+entry2.pack()
+
+#実行結果を表示するテキストウィジェット
+text_widget = Text(window, wrap=tk.WORD)
+text_widget.pack(expand=True, fill="both")
+
+# #テキストウィジェットにスクロールバーを追加
+# scrollbar = Scrollbar(window, command=text_widget.yview)
+# scrollbar.pack(side="right", fill="y")
+# text_widget.config(yscrollcommand=scrollbar.set)
+
+
+#URLを格納するリスト
+url_list = []
+
+#パラメータを格納するリスト
+parameter_list=[]
+
+#ページタイトルを格納するリスト
+title_list=[]
+
+#抽出したキーワード(MBSD{xxxx})を格納するリスト
+keyword_list = []
+
+def website_scraping(start_url,target_domain):
+
 
     #URLからリンクを収集、再帰的に処理する関数
     def get_urls(url):
 
         # URLをurl_listに追加
         url_list.append(url)
-        
+
         # ページのコンテンツを取得
         response = requests.get(url)
 
@@ -79,23 +108,39 @@ try:
                 # 収集済みのURLでない場合に再帰的に処理
                 get_urls(href)
 
+    #各リストの内容をクリア
+    url_list.clear()
+    parameter_list.clear()
+    title_list.clear()
+    keyword_list.clear()
+    
     #URLを収集
     if target_domain in start_url:
         get_urls(start_url)
 
+    text_widget.delete(1.0, tk.END)
     #収集済みのURLを表示
-    print("\nURL|パラメータ|ページタイトル")
+    text_widget.insert(tk.END, "\nURL|パラメータ|ページタイトル\n")
     for url,parameter,title in zip(url_list,parameter_list,title_list):
-        print(url,parameter,title)
+        text_widget.insert(tk.END, f"{url}|{parameter}|{title}\n")
 
     #キーワードリストを表示
-    print("\nKeyWord:")
+    text_widget.insert(tk.END, "\nKeyword\n")
     for k in keyword_list:
-        print(k)
-    
-    input("Enterを押すと終了します")
-        
-#何かしらのエラーが発生したらエラー表示
-except Exception: 
-    print("エラーが発生しました")
-    input("Enterを押すと終了します")
+        text_widget.insert(tk.END, f"{k}\n")
+
+
+#ボタンの作成
+scraping_button = tk.Button(window, text="実行", command=lambda:website_scraping(str(entry1.get()),str(entry2.get())))
+scraping_button.pack()
+
+#ウィンドウのメインループ
+window.mainloop()
+
+# #何かしらのエラーが発生したらエラー表示
+# except Exception:
+#     print("エラーが発生しました")
+#     input("Enterを押すと終了します")
+
+
+
