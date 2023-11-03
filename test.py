@@ -4,7 +4,7 @@ import re
 import urllib.parse
 import tkinter as tk
 from tkinter import Scrollbar, Text
-
+from tkinter import ttk
 
 
 #とりあえずのエラー処理
@@ -12,30 +12,69 @@ from tkinter import Scrollbar, Text
 
 
 #--------GUI-------------
+def on_window_resize(event):
+    # ウィンドウの幅と高さを取得
+    window_width = event.width
+    window_height = event.height
+
+    # 表の幅と高さを調整
+    tree_width = window_width - 20  # 余白を設定
+    tree.column("URL", width=tree_width // 3)
+    tree.column("パラメータ", width=tree_width // 3)
+    tree.column("ページタイトル", width=tree_width // 3)
+
+    # 入力欄の幅を調整
+    input_width = window_width - 40  # 余白を設定
+    entry1.config(width=input_width)
+    entry2.config(width=input_width)
+    
+    # Treeviewの高さを調整
+    treeview_height = window_height - 100  # 余白を設定
+    tree["height"] = treeview_height
+
 
 #Tkinterウィンドウの作成
-window = tk.Tk()
-window.title("自動巡回ツール")
+root = tk.Tk()
+root.title("自動巡回ツール")
+root.geometry('400x300')
+root.bind("<Configure>", on_window_resize)
 
-#ラベルと入力欄の作成
-label1 = tk.Label(window, text="対象サイトのURLを入力してください（例：https://example.com/)")
+#URLとドメインの入力欄
+label1 = tk.Label(root, text="対象サイトのURLを入力してください（例：https://example.com/)")
 label1.pack()
 
-entry1 = tk.Entry(window)
+entry1 = tk.Entry(root)
 entry1.pack()
 
-label2 = tk.Label(window, text="対象のドメインを入力してください（例：example.com)")
+label2 = tk.Label(root, text="対象のドメインを入力してください（例：example.com)")
 label2.pack()
 
-entry2 = tk.Entry(window)
+entry2 = tk.Entry(root)
 entry2.pack()
 
-#実行結果を表示するテキストウィジェット
-text_widget = Text(window, wrap=tk.WORD)
-text_widget.pack(expand=True, fill="both")
+
+# 列の識別名を指定
+column = ('URL', 'パラメータ', 'ページタイトル')
+
+# Treeviewの生成
+tree = ttk.Treeview(root, columns=column)
+# 列の設定
+tree.column('#0',width=0, stretch='no')
+tree.column('URL', anchor='w', width=80)
+tree.column('パラメータ',anchor='w', width=100)
+tree.column('ページタイトル', anchor='w', width=80)
+# 列の見出し設定
+tree.heading('#0',text='')
+tree.heading('URL', text='URL',anchor='w')
+tree.heading('パラメータ', text='パラメータ', anchor='w')
+tree.heading('ページタイトル',text='ページタイトル', anchor='w')
+
+# #実行結果を表示するテキストウィジェット
+# text_widget = Text(root, wrap=tk.WORD)
+# text_widget.pack(expand=True, fill="both")
 
 # #テキストウィジェットにスクロールバーを追加
-# scrollbar = Scrollbar(window, command=text_widget.yview)
+# scrollbar = Scrollbar(root, command=text_widget.yview)
 # scrollbar.pack(side="right", fill="y")
 # text_widget.config(yscrollcommand=scrollbar.set)
 
@@ -118,24 +157,33 @@ def website_scraping(start_url,target_domain):
     if target_domain in start_url:
         get_urls(start_url)
 
-    text_widget.delete(1.0, tk.END)
-    #収集済みのURLを表示
-    text_widget.insert(tk.END, "\nURL|パラメータ|ページタイトル\n")
-    for url,parameter,title in zip(url_list,parameter_list,title_list):
-        text_widget.insert(tk.END, f"{url}|{parameter}|{title}\n")
+    # text_widget.delete(1.0, tk.END)
+    # #収集済みのURLを表示
+    # text_widget.insert(tk.END, "\nURL|パラメータ|ページタイトル\n")
+    # for url,parameter,title in zip(url_list,parameter_list,title_list):
+    #     text_widget.insert(tk.END, f"{url}|{parameter}|{title}\n")
 
-    #キーワードリストを表示
-    text_widget.insert(tk.END, "\nKeyword\n")
-    for k in keyword_list:
-        text_widget.insert(tk.END, f"{k}\n")
+    # #キーワードリストを表示
+    # text_widget.insert(tk.END, "\nKeyword\n")
+    # for k in keyword_list:
+    #     text_widget.insert(tk.END, f"{k}\n")
+
+    # レコードの追加
+    cnt=0
+    for url,parameter,title in zip(url_list,parameter_list,title_list):
+        cnt+=1
+        tree.insert(parent='', index='end', iid=cnt ,values=(url, parameter,title))
+
+# ウィジェットの配置
+tree.pack(fill=tk.BOTH, expand=True)
 
 
 #ボタンの作成
-scraping_button = tk.Button(window, text="実行", command=lambda:website_scraping(str(entry1.get()),str(entry2.get())))
+scraping_button = tk.Button(root, text="実行", command=lambda:website_scraping(str(entry1.get()),str(entry2.get())))
 scraping_button.pack()
 
 #ウィンドウのメインループ
-window.mainloop()
+root.mainloop()
 
 # #何かしらのエラーが発生したらエラー表示
 # except Exception:
