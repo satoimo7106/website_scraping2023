@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 import re
 import urllib.parse
 import tkinter as tk
-from tkinter import Scrollbar, Text
 from tkinter import ttk
 from tkinter import messagebox
 
@@ -19,19 +18,20 @@ try:
         window_height = event.height
 
         # 表の幅と高さを調整
-        result_tree_width = window_width - 20  # 余白を設定
-        result_tree.column("URL", width=result_tree_width // 3)
-        result_tree.column("パラメータ", width=result_tree_width // 3)
-        result_tree.column("ページタイトル", width=result_tree_width // 3)
+        result_treeview_width = window_width - 20  # 余白を設定
+        result_treeview.column("URL", width=result_treeview_width // 4)
+        result_treeview.column("パラメータ", width=result_treeview_width // 4)
+        result_treeview.column("ページタイトル", width=result_treeview_width // 4)
+        result_treeview.column("キーワード", width=result_treeview_width // 4)
 
         # 入力欄の幅を調整
         input_width = window_width - 40  # 余白を設定
         entry1.config(width=input_width)
         entry2.config(width=input_width)
         
-        # result_Treeviewの高さを調整
-        result_treeview_height = window_height - 100  # 余白を設定
-        result_tree["height"] = result_treeview_height
+        # # Treeviewの高さを調整
+        # treeview_height = window_height - 100  # 余白を設定
+        # result_treeview["height"] = treeview_height
         
         
         # ボタンのサイズを調整
@@ -43,7 +43,7 @@ try:
     #Tkinterウィンドウの作成
     root = tk.Tk()
     root.title("自動巡回ツール")
-    root.geometry('400x300')
+    root.geometry('500x400')
     root.bind("<Configure>", on_window_resize)
 
     #URLとドメインの入力欄
@@ -51,40 +51,33 @@ try:
     label1.pack()
 
     entry1 = tk.Entry(root)
-    entry1.pack()
+    entry1.pack(pady=10)
 
     label2 = tk.Label(root, text="対象のドメインを入力してください（例：example.com)")
     label2.pack()
 
     entry2 = tk.Entry(root)
-    entry2.pack()
+    entry2.pack(pady=10)
 
 
     # 列の識別名を指定
-    column = ('URL', 'パラメータ', 'ページタイトル')
+    column = ('URL', 'パラメータ', 'ページタイトル','キーワード')
 
-    # result_Treeviewの生成
-    result_tree = ttk.result_Treeview(root, columns=column)
+    # Treeviewの生成
+    result_treeview = ttk.Treeview(root, columns=column)
     # 列の設定
-    result_tree.column('#0',width=0, stretch='no')
-    result_tree.column('URL', anchor='w', width=80)
-    result_tree.column('パラメータ',anchor='w', width=100)
-    result_tree.column('ページタイトル', anchor='w', width=80)
+    result_treeview.column('#0',width=0, stretch='no')
+    result_treeview.column('URL', anchor='w', width=80)
+    result_treeview.column('パラメータ',anchor='w', width=80)
+    result_treeview.column('ページタイトル', anchor='w', width=80)
+    result_treeview.column('キーワード', anchor='w', width=80)
+
     # 列の見出し設定
-    result_tree.heading('#0',text='')
-    result_tree.heading('URL', text='URL',anchor='w')
-    result_tree.heading('パラメータ', text='パラメータ', anchor='w')
-    result_tree.heading('ページタイトル',text='ページタイトル', anchor='w')
-
-
-    # #実行結果を表示するテキストウィジェット
-    # text_widget = Text(root, wrap=tk.WORD)
-    # text_widget.pack(expand=True, fill="both")
-
-    # #テキストウィジェットにスクロールバーを追加
-    # scrollbar = Scrollbar(root, command=text_widget.yview)
-    # scrollbar.pack(side="right", fill="y")
-    # text_widget.config(yscrollcommand=scrollbar.set)
+    result_treeview.heading('#0',text='')
+    result_treeview.heading('URL', text='URL',anchor='w')
+    result_treeview.heading('パラメータ', text='パラメータ', anchor='w')
+    result_treeview.heading('ページタイトル',text='ページタイトル', anchor='w')
+    result_treeview.heading('キーワード',text='キーワード', anchor='w')
 
 
     #URLを格納するリスト
@@ -101,15 +94,27 @@ try:
 
     def website_scraping(start_url,target_domain):
 
+        #treeviewの内容をクリア
+        result_treeview.delete(*result_treeview.get_children())
+
+        #各リストの内容をクリア
+        url_list.clear()
+        parameter_list.clear()
+        title_list.clear()
+        keyword_list.clear()
+
 
         #URLからリンクを収集、再帰的に処理する関数
         def get_urls(url):
 
             # URLをurl_listに追加
             url_list.append(url)
-
-            # ページのコンテンツを取得
-            response = requests.get(url)
+            
+            try:
+                # ページのコンテンツを取得
+                response = requests.get(url)
+            except requests.exceptions.MissingSchema:
+                messagebox.showerror("エラー", "URLの形式が正しくありません。\nURLはhttp:// または https://から始まる形式で入力してください")
 
             # BeautifulSoupを使用してHTMLを解析
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -140,20 +145,15 @@ try:
 
             #キーワードを抽出する
             # 正規表現を使用して"MBSD{xxxx}"を抽出して一致したものをすべてリストに格納
-            keyword=re.findall(r'MBSD\{[^\}]*\}', website_text)
-            
-            #ページタイトルが取得できた場合、ページタイトルリストに追加
-            if keyword:
-                keyword_list.append(keyword.string)
-            #取得できなかった場合、ページタイトルリストに"なし"を追加
+            keywords=re.findall(r'MBSD\{[^\}]*\}', website_text)
+
+            #キーワードが取得できた場合、キーワードリストに追加
+            if keywords:
+                keywords=','.join(map(str, keywords))
+                keyword_list.append(keywords)
+            #取得できなかった場合、キーワードリストに"なし"を追加
             else:
                 keyword_list.append("なし")
-
-            # for k in keyword:
-            #     #キーワードリストに含まれていない場合に追加
-            #     if k not in keyword_list:
-            #         keyword_list.append(k)
-
 
             for link in links:
                 #aタグのhref属性（URL部分）を取得
@@ -162,37 +162,31 @@ try:
                     # 収集済みのURLでない場合に再帰的に処理
                     get_urls(href)
 
-        #各リストの内容をクリア
-        url_list.clear()
-        parameter_list.clear()
-        title_list.clear()
-        keyword_list.clear()
-        
         #URLを収集
         if target_domain in start_url:
             get_urls(start_url)
 
-
         # レコードの追加
         cnt=0
-        for url,parameter,title in zip(url_list,parameter_list,title_list):
+        for url,parameter,title,keyword in zip(url_list,parameter_list,title_list,keyword_list):
             cnt+=1
-            result_tree.insert(parent='', index='end', iid=cnt ,values=(url, parameter,title))
+            result_treeview.insert(parent='', index='end', iid=cnt ,values=(url, parameter,title,keyword))
+
 
     # ウィジェットの配置
-    result_tree.pack(fill=tk.BOTH, expand=True)
+    result_treeview.pack(fill=tk.BOTH, expand=True)
 
 
     #ボタンの作成
     scraping_button = tk.Button(root, text="実行", command=lambda:website_scraping(str(entry1.get()),str(entry2.get())))
-    scraping_button.pack()
+    scraping_button.pack(padx=10,pady=10)
 
     #ウィンドウのメインループ
     root.mainloop()
 
 # #何かしらのエラーが発生したらエラー表示
 except Exception as e:
-    tk.messagebox.showerror("エラー", str(e))
+    messagebox.showerror("エラー", "エラーが発生しました")
 
 
 
