@@ -192,7 +192,7 @@ try:
                 values = result_treeview.item(item)["values"]
                 csvwriter.writerow(values)
 
-    # ウィジェットの配置
+    #実行結果の表
     result_treeview.pack(fill=tk.BOTH, expand=True)
 
 
