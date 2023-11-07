@@ -5,13 +5,15 @@ import urllib.parse
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
+import csv
 
 
-#とりあえずのエラー処理
+#エラー処理
 try:
 
 
-    #--------GUI-------------
+    #ウィンドウサイズに応じてGUIの調整をする関数
     def on_window_resize(event):
         # ウィンドウの幅と高さを取得
         window_width = event.width
@@ -28,31 +30,34 @@ try:
         input_width = window_width - 40  # 余白を設定
         entry1.config(width=input_width)
         entry2.config(width=input_width)
-        
+
         # # Treeviewの高さを調整
         # treeview_height = window_height - 100  # 余白を設定
         # result_treeview["height"] = treeview_height
-        
-        
+
         # ボタンのサイズを調整
-        button_width = window_width // 2  # ウィンドウの幅の半分に設定
+        button_width = window_width - 20
         scraping_button.config(width=button_width)
+        csv_export_button.config(width=button_width)
 
 
 
     #Tkinterウィンドウの作成
     root = tk.Tk()
     root.title("自動巡回ツール")
-    root.geometry('500x400')
+    root.geometry('600x500')
+
+    #ウィンドウサイズが変化したときにGUIのサイズを調整する
     root.bind("<Configure>", on_window_resize)
 
-    #URLとドメインの入力欄
+    #URLの入力欄
     label1 = tk.Label(root, text="対象サイトのURLを入力してください（例：https://example.com/)")
     label1.pack()
 
     entry1 = tk.Entry(root)
     entry1.pack(pady=10)
 
+    #ドメインの入力欄
     label2 = tk.Label(root, text="対象のドメインを入力してください（例：example.com)")
     label2.pack()
 
@@ -92,6 +97,7 @@ try:
     #抽出したキーワード(MBSD{xxxx})を格納するリスト
     keyword_list = []
 
+    #ウェブサイトの規模を調査する関数
     def website_scraping(start_url,target_domain):
 
         #treeviewの内容をクリア
@@ -109,7 +115,7 @@ try:
 
             # URLをurl_listに追加
             url_list.append(url)
-            
+
             try:
                 # ページのコンテンツを取得
                 response = requests.get(url)
@@ -166,20 +172,39 @@ try:
         if target_domain in start_url:
             get_urls(start_url)
 
-        # レコードの追加
+        #実行結果を表形式にする
         cnt=0
         for url,parameter,title,keyword in zip(url_list,parameter_list,title_list,keyword_list):
             cnt+=1
             result_treeview.insert(parent='', index='end', iid=cnt ,values=(url, parameter,title,keyword))
 
+    #csvでエクスポートする関数
+    def export_to_csv():
+        # ファイル保存ダイアログを表示し、CSVファイルのファイル名と保存場所を選択
+        file_path = filedialog.asksaveasfilename(title = "名前を付けて保存",defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
 
-    # ウィジェットの配置
+        # ファイル名が空のときは処理をしない
+        if not file_path:
+            return
+
+        with open(file_path, "w", newline="") as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(["URL", "パラメータ", "ページタイトル","キーワード"])
+            for item in result_treeview.get_children():
+                values = result_treeview.item(item)["values"]
+                csvwriter.writerow(values)
+
+    #実行結果の表
     result_treeview.pack(fill=tk.BOTH, expand=True)
 
 
-    #ボタンの作成
+    #実行ボタン
     scraping_button = tk.Button(root, text="実行", command=lambda:website_scraping(str(entry1.get()),str(entry2.get())))
     scraping_button.pack(padx=10,pady=10)
+
+    # エクスポートボタン
+    csv_export_button = tk.Button(root, text="実行結果をCSVで出力", command=export_to_csv)
+    csv_export_button.pack(padx=10,pady=10)
 
     #ウィンドウのメインループ
     root.mainloop()
