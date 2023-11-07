@@ -45,7 +45,7 @@ try:
     #Tkinterウィンドウの作成
     root = tk.Tk()
     root.title("自動巡回ツール")
-    root.geometry('500x400')
+    root.geometry('600x500')
 
     #ウィンドウサイズが変化したときにGUIのサイズを調整する
     root.bind("<Configure>", on_window_resize)
