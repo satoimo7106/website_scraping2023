@@ -5,6 +5,8 @@ import urllib.parse
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
+import csv
 
 
 #とりあえずのエラー処理
@@ -35,8 +37,10 @@ try:
         
         
         # ボタンのサイズを調整
-        button_width = window_width // 2  # ウィンドウの幅の半分に設定
+        button_width = window_width-20 # ウィンドウの幅の半分に設定
+        print(window_width)
         scraping_button.config(width=button_width)
+        csv_export_button.config(width=button_width)
 
 
 
@@ -172,14 +176,33 @@ try:
             cnt+=1
             result_treeview.insert(parent='', index='end', iid=cnt ,values=(url, parameter,title,keyword))
 
+    #csvでエクスポート
+    def export_to_csv():
+        # ファイル保存ダイアログを表示し、CSVファイルのファイル名と保存場所を選択
+        file_path = filedialog.asksaveasfilename(title = "名前を付けて保存",defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
+
+        # ファイル名が空のときは処理をしない
+        if not file_path:
+            return
+
+        with open(file_path, "w", newline="") as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(["URL", "パラメータ", "ページタイトル","キーワード"])
+            for item in result_treeview.get_children():
+                values = result_treeview.item(item)["values"]
+                csvwriter.writerow(values)
 
     # ウィジェットの配置
     result_treeview.pack(fill=tk.BOTH, expand=True)
 
 
-    #ボタンの作成
+    #実行ボタン
     scraping_button = tk.Button(root, text="実行", command=lambda:website_scraping(str(entry1.get()),str(entry2.get())))
     scraping_button.pack(padx=10,pady=10)
+
+    # エクスポートボタン
+    csv_export_button = tk.Button(root, text="実行結果をCSVで出力", command=export_to_csv)
+    csv_export_button.pack(padx=10,pady=10)
 
     #ウィンドウのメインループ
     root.mainloop()
