@@ -17,7 +17,6 @@ try:
     def on_window_resize(event):
         # ウィンドウの幅と高さを取得
         window_width = event.width
-        window_height = event.height
 
         # 表の幅と高さを調整
         result_treeview_width = window_width - 20  # 余白を設定
@@ -30,10 +29,6 @@ try:
         input_width = window_width - 40  # 余白を設定
         entry1.config(width=input_width)
         entry2.config(width=input_width)
-
-        # # Treeviewの高さを調整
-        # treeview_height = window_height - 100  # 余白を設定
-        # result_treeview["height"] = treeview_height
 
         # ボタンのサイズを調整
         button_width = window_width - 20
@@ -65,7 +60,7 @@ try:
     entry2.pack(pady=10)
 
 
-    # 列の識別名を指定
+    # 列名を設定
     column = ('URL', 'パラメータ', 'ページタイトル','キーワード')
 
     # Treeviewの生成
