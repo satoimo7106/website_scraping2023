@@ -17,35 +17,30 @@ try:
     def on_window_resize(event):
         # ウィンドウの幅と高さを取得
         window_width = event.width
-        window_height = event.height
 
         # 表の幅と高さを調整
-        result_treeview_width = window_width - 20  # 余白を設定
-        result_treeview.column("URL", width=result_treeview_width // 4)
-        result_treeview.column("パラメータ", width=result_treeview_width // 4)
-        result_treeview.column("ページタイトル", width=result_treeview_width // 4)
-        result_treeview.column("キーワード", width=result_treeview_width // 4)
+        result_treeview.column("URL", width=window_width // 4)
+        result_treeview.column("パラメータ", width=window_width // 4)
+        result_treeview.column("ページタイトル", width=window_width // 4)
+        result_treeview.column("キーワード", width=window_width // 4)
 
         # 入力欄の幅を調整
-        input_width = window_width - 40  # 余白を設定
-        entry1.config(width=input_width)
-        entry2.config(width=input_width)
-
-        # # Treeviewの高さを調整
-        # treeview_height = window_height - 100  # 余白を設定
-        # result_treeview["height"] = treeview_height
+        entry1.config(width=window_width)
+        entry2.config(width=window_width)
 
         # ボタンのサイズを調整
-        button_width = window_width - 20
-        scraping_button.config(width=button_width)
-        csv_export_button.config(width=button_width)
+        scraping_button.config(width=window_width)
+        csv_export_button.config(width=window_width)
 
 
 
     #Tkinterウィンドウの作成
     root = tk.Tk()
     root.title("自動巡回ツール")
+    #ウィンドウの初期サイズを設定
     root.geometry('600x500')
+    # ウィンドウの最小サイズを設定
+    root.minsize(600, 500)
 
     #ウィンドウサイズが変化したときにGUIのサイズを調整する
     root.bind("<Configure>", on_window_resize)
@@ -55,17 +50,17 @@ try:
     label1.pack()
 
     entry1 = tk.Entry(root)
-    entry1.pack(pady=10)
+    entry1.pack(padx=10,pady=10)
 
     #ドメインの入力欄
     label2 = tk.Label(root, text="対象のドメインを入力してください（例：example.com)")
     label2.pack()
 
     entry2 = tk.Entry(root)
-    entry2.pack(pady=10)
+    entry2.pack(padx=10,pady=10)
 
 
-    # 列の識別名を指定
+    # 列名を設定
     column = ('URL', 'パラメータ', 'ページタイトル','キーワード')
 
     # Treeviewの生成
@@ -133,10 +128,11 @@ try:
 
             #URLからパラメータ（q="xxxx")を取得
             parameter=urllib.parse.urlparse(url).query
+            
             #パラメータが取得できた場合、パラメータリストに追加
             if parameter:
                 parameter_list.append(parameter)
-            #【要検討】取得できなかった場合、パラメータリストに"なし"を追加
+            #取得できなかった場合、パラメータリストに"なし"を追加
             else:
                 parameter_list.append("なし")
 
@@ -185,7 +181,6 @@ try:
             messagebox.showerror("エラー", "出力前に実行してください。")
             return
         
-        
         # ファイル保存ダイアログを表示し、CSVファイルのファイル名と保存場所を選択
         file_path = filedialog.asksaveasfilename(title = "名前を付けて保存",defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
 
@@ -217,7 +212,7 @@ try:
 
 # #何かしらのエラーが発生したらエラー表示
 except Exception as e:
-    messagebox.showerror("エラー", "エラーが発生しました")
+    messagebox.showerror("エラー", "エラーが発生しました。")
 
 
 
