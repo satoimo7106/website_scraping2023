@@ -180,6 +180,12 @@ try:
 
     #csvでエクスポートする関数
     def export_to_csv():
+        #表が空の時の処理
+        if not result_treeview.get_children():
+            messagebox.showerror("エラー", "出力前に実行してください。")
+            return
+        
+        
         # ファイル保存ダイアログを表示し、CSVファイルのファイル名と保存場所を選択
         file_path = filedialog.asksaveasfilename(title = "名前を付けて保存",defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
 
